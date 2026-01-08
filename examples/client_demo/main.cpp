@@ -1,3 +1,4 @@
+// 概述: A2A 客户端示例，演示发现 AgentCard、发送消息与流式响应。
 #include <a2a/client/a2a_client.hpp>
 #include <a2a/client/card_resolver.hpp>
 #include <a2a/core/exception.hpp>
@@ -7,6 +8,7 @@
 
 using namespace a2a;
 
+// 程序入口：运行客户端演示流程（非常重要）。
 int main() {
     try {
         std::cout << "=== A2A C++ Client Demo ===" << std::endl << std::endl;

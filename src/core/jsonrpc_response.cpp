@@ -1,3 +1,4 @@
+// 概述: 实现 JSON-RPC 响应的序列化与反序列化，使用 nlohmann::json 处理 JSON 结构。
 #include <a2a/core/jsonrpc_response.hpp>
 #include <a2a/core/exception.hpp>
 #include <json.hpp>
@@ -7,6 +8,7 @@ using json = nlohmann::json;
 namespace a2a {
 
 std::string JsonRpcResponse::to_json() const {
+    // 将响应对象序列化为 JSON 字符串（非常重要）。
     try {
         json j;
         j["jsonrpc"] = jsonrpc_;
@@ -37,6 +39,7 @@ std::string JsonRpcResponse::to_json() const {
 }
 
 JsonRpcResponse JsonRpcResponse::from_json(const std::string& json_str) {
+    // 将 JSON 字符串解析为响应对象，处理 result/error 分支（非常重要）。
     try {
         json j = json::parse(json_str);
         
@@ -98,11 +101,13 @@ JsonRpcResponse JsonRpcResponse::from_json(const std::string& json_str) {
 JsonRpcResponse JsonRpcResponse::create_error(const std::string& id,
                                              ErrorCode code,
                                              const std::string& message) {
+    // 构造错误响应的便捷工厂。
     return JsonRpcResponse(id, JsonRpcError(code, message));
 }
 
 JsonRpcResponse JsonRpcResponse::create_success(const std::string& id,
                                                const std::string& result_json) {
+    // 构造成功响应的便捷工厂。
     return JsonRpcResponse(id, result_json);
 }
 

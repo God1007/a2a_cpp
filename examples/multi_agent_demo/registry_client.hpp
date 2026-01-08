@@ -1,3 +1,4 @@
+// 概述: 注册中心客户端，基于 libcurl 与 nlohmann::json 进行注册、查询与心跳维护。
 #pragma once
 
 #include "agent_registry.hpp"
@@ -12,6 +13,7 @@
 using json = nlohmann::json;
 
 // CURL 回调函数
+// libcurl 写回调：收集响应体。
 static size_t WriteCallback(void* contents, size_t size, size_t nmemb, std::string* userp) {
     userp->append((char*)contents, size * nmemb);
     return size * nmemb;
@@ -22,15 +24,18 @@ static size_t WriteCallback(void* contents, size_t size, size_t nmemb, std::stri
  */
 class RegistryClient {
 public:
+    // 构造注册中心客户端并指定服务地址。
     explicit RegistryClient(const std::string& registry_url = "http://localhost:8500")
         : registry_url_(registry_url)
         , heartbeat_running_(false) {}
     
+    // 析构时停止心跳线程。
     ~RegistryClient() {
         stop_heartbeat();
     }
     
     // 注册 Agent
+    // 向注册中心注册 Agent 并启动心跳（非常重要）。
     bool register_agent(const AgentRegistration& registration) {
         json request = registration.to_json();
         auto response = post("/v1/agent/register", request.dump());
@@ -47,6 +52,7 @@ public:
     }
     
     // 注销 Agent
+    // 注销 Agent 并停止心跳。
     bool deregister_agent(const std::string& agent_id) {
         stop_heartbeat();
         
@@ -57,6 +63,7 @@ public:
     }
     
     // 根据标签查找 Agent
+    // 根据标签查询可用 Agent 列表。
     std::vector<AgentRegistration> find_agents_by_tag(const std::string& tag) {
         json request = {{"tag", tag}};
         auto response = post("/v1/agent/find", request.dump());
@@ -73,6 +80,7 @@ public:
     }
     
     // 获取所有 Agent
+    // 获取所有已注册的 Agent。
     std::vector<AgentRegistration> get_all_agents() {
         auto response = get("/v1/agents");
         
@@ -88,6 +96,7 @@ public:
     }
     
     // 选择一个 Agent（负载均衡：轮询）
+    // 按标签选择 Agent 地址，使用轮询策略（非常重要）。
     std::string select_agent_by_tag(const std::string& tag) {
         auto agents = find_agents_by_tag(tag);
         
@@ -107,6 +116,7 @@ public:
 
 private:
     // 发送 POST 请求
+    // 发送 JSON POST 请求并返回解析后的 JSON。
     json post(const std::string& path, const std::string& body) {
         CURL* curl = curl_easy_init();
         if (!curl) {
@@ -141,6 +151,7 @@ private:
     }
     
     // 发送 GET 请求
+    // 发送 GET 请求并返回解析后的 JSON。
     json get(const std::string& path) {
         CURL* curl = curl_easy_init();
         if (!curl) {
@@ -166,6 +177,7 @@ private:
     }
     
     // 启动心跳线程
+    // 启动后台心跳线程维持注册状态。
     void start_heartbeat() {
         if (heartbeat_running_) {
             return;
@@ -187,6 +199,7 @@ private:
     }
     
     // 停止心跳线程
+    // 停止后台心跳线程并回收资源。
     void stop_heartbeat() {
         if (!heartbeat_running_) {
             return;

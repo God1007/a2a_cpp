@@ -1,9 +1,11 @@
+// 概述: 实现 Artifact 的 JSON 序列化与反序列化，使用字符串拼装与解析。
 #include <a2a/models/artifact.hpp>
 #include <sstream>
 
 namespace a2a {
 
 std::string Artifact::to_json() const {
+    // 序列化产物为 JSON 字符串。
     std::ostringstream oss;
     oss << "{";
     
@@ -45,6 +47,7 @@ std::string Artifact::to_json() const {
 }
 
 Artifact Artifact::from_json(const std::string& json) {
+    // 反序列化 JSON 字符串为产物对象。
     Artifact artifact;
     
     // Extract id

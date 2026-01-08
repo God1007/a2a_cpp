@@ -1,3 +1,4 @@
+// 概述: 动态发现 Math Agent，实现注册中心注册与 Redis 历史读取的数学服务。
 #include "redis_task_store.hpp"
 #include "qwen_client.hpp"
 #include "http_server.hpp"
@@ -23,6 +24,7 @@ const std::string API_KEY = "own—key";
 
 class DynamicMathAgent {
 public:
+    // 构造数学 Agent 并初始化 Redis/注册中心客户端。
     DynamicMathAgent(const std::string& agent_id,
                     const std::string& listen_address,
                     const std::string& registry_url,
@@ -37,6 +39,7 @@ public:
         std::cout << "[Math Agent] 初始化完成" << std::endl;
     }
     
+    // 启动 HTTP 服务并注册到注册中心（非常重要）。
     void start(int port) {
         // 启动 HTTP 服务器
         HttpServer server(port);
@@ -78,6 +81,7 @@ public:
     }
 
 private:
+    // 处理 JSON-RPC 请求并生成响应（非常重要）。
     std::string handle_request(const std::string& body) {
         try {
             auto request_json = json::parse(body);
@@ -146,6 +150,7 @@ private:
         }
     }
     
+    // 构建 Math Agent 的 AgentCard JSON。
     std::string get_agent_card() {
         json card = {
             {"name", "Math Agent"},
@@ -186,6 +191,7 @@ private:
 };
 
 int main(int argc, char* argv[]) {
+    // 程序入口：解析参数并启动动态 Math Agent（非常重要）。
     if (argc < 4) {
         std::cerr << "用法: " << argv[0] << " <agent_id> <port> <registry_url> [redis_host] [redis_port]" << std::endl;
         std::cerr << "示例: " << argv[0] << " math-1 5001 http://localhost:8500 127.0.0.1 6379" << std::endl;

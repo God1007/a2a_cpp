@@ -1,3 +1,4 @@
+// 概述: 实现任务状态的 JSON 序列化，包含时间戳格式化工具。
 #include <a2a/models/task_status.hpp>
 #include <sstream>
 #include <iomanip>
@@ -6,6 +7,7 @@
 namespace a2a {
 
 // Helper to convert timestamp to ISO 8601 string
+// 将时间戳格式化为 ISO 8601 字符串。
 static std::string timestamp_to_iso8601(const Timestamp& ts) {
     auto time_t_val = std::chrono::system_clock::to_time_t(ts);
     std::tm tm_val;
@@ -30,6 +32,7 @@ static std::string timestamp_to_iso8601(const Timestamp& ts) {
 }
 
 std::string AgentTaskStatus::to_json() const {
+    // 序列化任务状态为 JSON 字符串。
     std::ostringstream oss;
     oss << "{"
         << "\"state\":\"" << to_string(state_) << "\","
@@ -44,6 +47,7 @@ std::string AgentTaskStatus::to_json() const {
 }
 
 AgentTaskStatus AgentTaskStatus::from_json(const std::string& json) {
+    // 反序列化 JSON 字符串为任务状态对象。
     AgentTaskStatus status;
     
     // Extract state

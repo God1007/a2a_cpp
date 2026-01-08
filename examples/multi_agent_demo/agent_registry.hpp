@@ -1,3 +1,4 @@
+// 概述: 注册中心数据结构，使用 nlohmann::json 与互斥锁维护 Agent 注册与健康状态。
 #pragma once
 
 #include <string>
@@ -22,6 +23,7 @@ struct AgentRegistration {
     json agent_card;             // Agent Card (A2A 协议标准)
     
     // 序列化
+    // 将注册信息序列化为 JSON。
     json to_json() const {
         json j = {
             {"id", id},
@@ -37,6 +39,7 @@ struct AgentRegistration {
     }
     
     // 反序列化
+    // 从 JSON 解析注册信息。
     static AgentRegistration from_json(const json& j) {
         AgentRegistration reg;
         reg.id = j.at("id").get<std::string>();
@@ -56,11 +59,13 @@ struct AgentRegistration {
  */
 class AgentRegistry {
 public:
+    // 构造注册中心并设置心跳超时与清理周期。
     explicit AgentRegistry(int heartbeat_timeout_sec = 30, int cleanup_interval_sec = 60)
         : heartbeat_timeout_(heartbeat_timeout_sec)
         , cleanup_interval_(cleanup_interval_sec) {}
     
     // 注册 Agent
+    // 注册或更新 Agent 信息（非常重要）。
     bool register_agent(const AgentRegistration& registration) {
         std::lock_guard<std::mutex> lock(mutex_);
         
@@ -77,6 +82,7 @@ public:
     }
     
     // 注销 Agent
+    // 从注册中心移除 Agent。
     bool deregister_agent(const std::string& agent_id) {
         std::lock_guard<std::mutex> lock(mutex_);
         
@@ -95,6 +101,7 @@ public:
     }
     
     // 心跳
+    // 更新 Agent 心跳时间。
     bool heartbeat(const std::string& agent_id) {
         std::lock_guard<std::mutex> lock(mutex_);
         
@@ -108,6 +115,7 @@ public:
     }
     
     // 根据标签查找 Agent
+    // 根据标签筛选 Agent 列表。
     std::vector<AgentRegistration> find_agents_by_tag(const std::string& tag) {
         std::lock_guard<std::mutex> lock(mutex_);
         
@@ -129,6 +137,7 @@ public:
     }
     
     // 获取所有 Agent
+    // 获取当前注册的所有 Agent。
     std::vector<AgentRegistration> get_all_agents() {
         std::lock_guard<std::mutex> lock(mutex_);
         
@@ -140,6 +149,7 @@ public:
     }
     
     // 健康检查，移除超时的 Agent
+    // 执行健康检查并清理超时的 Agent（非常重要）。
     void check_health() {
         std::lock_guard<std::mutex> lock(mutex_);
         

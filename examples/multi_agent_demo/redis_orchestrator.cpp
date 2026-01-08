@@ -1,3 +1,4 @@
+// 概述: Redis Orchestrator 实现，负责意图识别与调度 Math Agent，历史存储于 Redis。
 #include <a2a/server/task_manager.hpp>
 #include <a2a/client/a2a_client.hpp>
 #include <a2a/core/exception.hpp>
@@ -19,6 +20,7 @@ using namespace a2a;
  */
 class RedisOrchestrator {
 public:
+    // 构造编排器并初始化 TaskManager 与大模型客户端。
     explicit RedisOrchestrator(const std::string& api_key,
                                std::shared_ptr<ITaskStore> task_store,
                                int port = 5000)
@@ -42,6 +44,7 @@ public:
         std::cout << "[Orchestrator] 初始化完成（使用 Redis TaskStore）" << std::endl;
     }
     
+    // 启动 HTTP 服务并注册处理器（非常重要）。
     void start() {
         std::cout << "[Orchestrator] 启动在端口 " << port_ << std::endl;
         
@@ -66,6 +69,7 @@ public:
     }
 
 private:
+    // 处理 HTTP 请求：解析 JSON-RPC 并返回响应。
     std::string handle_http_request(const std::string& request_body) {
         try {
             auto jsonrpc_req = JsonRpcRequest::from_json(request_body);
@@ -96,6 +100,7 @@ private:
         }
     }
     
+    // 处理消息并调度到 Math Agent 或通用聊天（非常重要）。
     A2AResponse handle_message(const MessageSendParams& params) {
         const auto& message = params.message();
         std::string user_query = message.get_text();
@@ -136,6 +141,7 @@ private:
         return A2AResponse(reply);
     }
     
+    // 保存消息到 Redis TaskStore，必要时创建任务。
     void save_message_to_taskstore(const std::string& context_id, 
                                    const AgentMessage& message) {
         auto task_store = task_manager_.get_task_store();
@@ -156,6 +162,7 @@ private:
         std::cout << "[Orchestrator] 保存消息到 Redis TaskStore" << std::endl;
     }
     
+    // 简单意图识别：判断是否为数学问题。
     std::string identify_intent(const std::string& query) {
         std::string lower_query = query;
         std::transform(lower_query.begin(), lower_query.end(), 
@@ -175,6 +182,7 @@ private:
         return "general";
     }
     
+    // 调用 Math Agent 处理数学请求。
     std::string call_math_agent(const std::string& query,
                                 const std::optional<std::string>& context_id) {
         try {
@@ -208,6 +216,7 @@ private:
         }
     }
     
+    // 调用通义千问处理通用对话。
     std::string call_general_chat(const std::string& query) {
         try {
             std::string system_prompt = "你是一个智能助手。";
@@ -217,6 +226,7 @@ private:
         }
     }
     
+    // 构建并返回 AgentCard 元数据。
     AgentCard get_agent_card(const std::string& agent_url) {
         auto card = AgentCard::create()
             .with_name("Orchestrator (Redis TaskStore)")
@@ -234,11 +244,13 @@ private:
 };
 
 void signal_handler(int signal) {
+    // 处理终止信号并退出。
     std::cout << "\n[Orchestrator] 收到信号 " << signal << "，正在关闭..." << std::endl;
     exit(0);
 }
 
 int main(int argc, char* argv[]) {
+    // 程序入口：解析参数并启动 Redis Orchestrator（非常重要）。
     std::signal(SIGINT, signal_handler);
     std::signal(SIGTERM, signal_handler);
     

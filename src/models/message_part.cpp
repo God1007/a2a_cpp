@@ -1,3 +1,4 @@
+// 概述: 实现消息分片的 JSON 序列化与解析，包含转义与 Base64 编码辅助函数。
 #include <a2a/models/message_part.hpp>
 #include <sstream>
 #include <iomanip>
@@ -6,6 +7,7 @@
 namespace a2a {
 
 // Helper function to escape JSON string
+// 转义字符串中的 JSON 特殊字符，保证输出合法。
 static std::string escape_json_string(const std::string& input) {
     std::ostringstream oss;
     for (unsigned char c : input) {  // Use unsigned char to handle UTF-8 properly
@@ -33,6 +35,7 @@ static std::string escape_json_string(const std::string& input) {
 }
 
 // Base64 encoding helper (simplified)
+// 将二进制数据进行 Base64 编码（简化实现）。
 static std::string base64_encode(const std::vector<uint8_t>& data) {
     static const char* base64_chars = 
         "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
@@ -80,6 +83,7 @@ static std::string base64_encode(const std::vector<uint8_t>& data) {
 }
 
 // TextPart implementation
+// 序列化文本分片为 JSON。
 std::string TextPart::to_json() const {
     std::ostringstream oss;
     oss << "{"
@@ -90,6 +94,7 @@ std::string TextPart::to_json() const {
 }
 
 // FilePart implementation
+// 序列化文件分片为 JSON（含 Base64 数据）。
 std::string FilePart::to_json() const {
     std::ostringstream oss;
     oss << "{"
@@ -103,6 +108,7 @@ std::string FilePart::to_json() const {
 }
 
 // DataPart implementation
+// 序列化结构化数据分片为 JSON。
 std::string DataPart::to_json() const {
     std::ostringstream oss;
     oss << "{"
@@ -113,6 +119,7 @@ std::string DataPart::to_json() const {
 }
 
 // Part factory method
+// 根据 JSON 内容创建对应分片对象（非常重要）。
 std::unique_ptr<Part> Part::from_json(const std::string& json) {
     // Simplified parsing - in production use nlohmann/json
     

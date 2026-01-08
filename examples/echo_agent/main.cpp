@@ -1,3 +1,4 @@
+// 概述: Echo Agent 示例，展示 TaskManager 回调机制与内存 TaskStore 的使用。
 #include <a2a/server/task_manager.hpp>
 #include <a2a/server/memory_task_store.hpp>
 #include <a2a/core/exception.hpp>
@@ -7,6 +8,7 @@
 
 using namespace a2a;
 
+// 程序入口：构建回声 Agent 并进行简单消息测试（非常重要）。
 int main() {
     std::cout << "=== A2A C++ Echo Agent ===" << std::endl << std::endl;
     

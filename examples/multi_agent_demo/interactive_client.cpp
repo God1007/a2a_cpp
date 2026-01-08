@@ -1,3 +1,4 @@
+// 概述: 交互式 CLI 客户端，使用 libcurl 调用 Orchestrator 并展示响应。
 #include <iostream>
 #include <string>
 #include <curl/curl.h>
@@ -8,12 +9,14 @@
 using json = nlohmann::json;
 
 // CURL 回调函数
+// libcurl 写回调：收集响应体。
 size_t WriteCallback(void* contents, size_t size, size_t nmemb, std::string* userp) {
     userp->append((char*)contents, size * nmemb);
     return size * nmemb;
 }
 
 // 发送消息到 Agent
+// 构造 JSON-RPC 请求并发送到 Orchestrator（非常重要）。
 std::string send_message(const std::string& text, const std::string& context_id) {
     CURL* curl = curl_easy_init();
     if (!curl) {
@@ -82,12 +85,14 @@ std::string send_message(const std::string& text, const std::string& context_id)
 }
 
 // 生成会话 ID
+// 生成基于时间戳的会话 ID。
 std::string generate_session_id() {
     std::stringstream ss;
     ss << "session-" << std::time(nullptr);
     return ss.str();
 }
 
+// 程序入口：循环读取用户输入并发送请求（非常重要）。
 int main() {
     std::cout << "========================================" << std::endl;
     std::cout << "   A2A 交互式测试客户端" << std::endl;

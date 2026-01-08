@@ -1,3 +1,4 @@
+// 概述: 实现 A2A 客户端的 JSON-RPC 调用与流式订阅，基于 HttpClient 与协议模型。
 #include <a2a/client/a2a_client.hpp>
 #include <a2a/core/jsonrpc_request.hpp>
 #include <a2a/core/jsonrpc_response.hpp>
@@ -8,6 +9,7 @@
 namespace a2a {
 
 // Helper to generate UUID (simplified)
+// 生成简化的请求 ID。
 static std::string generate_uuid() {
     static int counter = 0;
     std::ostringstream oss;
@@ -18,6 +20,7 @@ static std::string generate_uuid() {
 // PIMPL implementation
 class A2AClient::Impl {
 public:
+    // 构造实现对象并规范化 base_url。
     explicit Impl(const std::string& base_url)
         : base_url_(base_url)
         , http_client_() {
@@ -31,6 +34,7 @@ public:
     HttpClient http_client_;
     
     // Helper to send JSON-RPC request
+    // 发送 JSON-RPC 请求并解析响应（非常重要）。
     JsonRpcResponse send_rpc_request(const std::string& method,
                                     const std::string& params_json) {
         // Create JSON-RPC request
@@ -69,14 +73,19 @@ public:
 };
 
 A2AClient::A2AClient(const std::string& base_url)
+    // 构造客户端并创建内部实现。
     : impl_(std::make_unique<Impl>(base_url)) {}
 
+// 默认析构。
 A2AClient::~A2AClient() = default;
 
+// 移动构造。
 A2AClient::A2AClient(A2AClient&&) noexcept = default;
+// 移动赋值。
 A2AClient& A2AClient::operator=(A2AClient&&) noexcept = default;
 
 A2AResponse A2AClient::send_message(const MessageSendParams& params) {
+    // 发送非流式消息并解析为任务或消息响应（非常重要）。
     // Serialize params to JSON
     std::string params_json = params.to_json();
     
@@ -105,6 +114,7 @@ A2AResponse A2AClient::send_message(const MessageSendParams& params) {
 
 void A2AClient::send_message_streaming(const MessageSendParams& params,
                                        std::function<void(const std::string&)> callback) {
+    // 发送流式消息并逐块回调处理响应。
     // Serialize params to JSON
     std::string params_json = params.to_json();
     
@@ -122,6 +132,7 @@ void A2AClient::send_message_streaming(const MessageSendParams& params,
 }
 
 AgentTask A2AClient::get_task(const std::string& task_id) {
+    // 查询任务详情并解析返回任务。
     // Create params
     TaskIdParams params;
     params.id = task_id;
@@ -139,6 +150,7 @@ AgentTask A2AClient::get_task(const std::string& task_id) {
 }
 
 AgentTask A2AClient::cancel_task(const std::string& task_id) {
+    // 请求取消任务并解析返回结果。
     // Create params
     TaskIdParams params;
     params.id = task_id;
@@ -157,6 +169,7 @@ AgentTask A2AClient::cancel_task(const std::string& task_id) {
 
 void A2AClient::subscribe_to_task(const std::string& task_id,
                                   std::function<void(const std::string&)> callback) {
+    // 订阅任务更新流并回调处理事件。
     // Create params
     TaskIdParams params;
     params.id = task_id;
@@ -176,6 +189,7 @@ void A2AClient::subscribe_to_task(const std::string& task_id,
 }
 
 void A2AClient::set_timeout(long seconds) {
+    // 设置 HTTP 请求超时。
     impl_->http_client_.set_timeout(seconds);
 }
 

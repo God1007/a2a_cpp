@@ -1,9 +1,11 @@
+// 概述: 实现消息发送/任务查询参数的 JSON 序列化与反序列化逻辑。
 #include <a2a/models/message_send_params.hpp>
 #include <sstream>
 
 namespace a2a {
 
 // MessageSendParams implementation
+// 序列化消息发送参数为 JSON 字符串。
 std::string MessageSendParams::to_json() const {
     std::ostringstream oss;
     oss << "{";
@@ -28,6 +30,7 @@ std::string MessageSendParams::to_json() const {
     return oss.str();
 }
 
+// 反序列化 JSON 字符串为消息发送参数。
 MessageSendParams MessageSendParams::from_json(const std::string& json) {
     MessageSendParams params;
     
@@ -81,6 +84,7 @@ MessageSendParams MessageSendParams::from_json(const std::string& json) {
 }
 
 // TaskQueryParams implementation
+// 序列化任务查询参数为 JSON 字符串。
 std::string TaskQueryParams::to_json() const {
     std::ostringstream oss;
     oss << "{";
@@ -106,6 +110,7 @@ std::string TaskQueryParams::to_json() const {
     return oss.str();
 }
 
+// 反序列化 JSON 字符串为任务查询参数。
 TaskQueryParams TaskQueryParams::from_json(const std::string& json) {
     TaskQueryParams params;
     
@@ -129,12 +134,14 @@ TaskQueryParams TaskQueryParams::from_json(const std::string& json) {
 }
 
 // TaskIdParams implementation
+// 序列化任务 ID 参数为 JSON 字符串。
 std::string TaskIdParams::to_json() const {
     std::ostringstream oss;
     oss << "{\"id\":\"" << id << "\"}";
     return oss.str();
 }
 
+// 反序列化 JSON 字符串为任务 ID 参数。
 TaskIdParams TaskIdParams::from_json(const std::string& json) {
     TaskIdParams params;
     

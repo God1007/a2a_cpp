@@ -1,3 +1,4 @@
+// 概述: Echo Agent 示例（含可选 HTTP 服务器），展示 TaskManager 与 JSON-RPC 处理流程。
 // echo_agent_with_server.cpp
 // 带 HTTP 服务器的完整 Echo Agent 示例
 // 
@@ -17,6 +18,7 @@
 
 using namespace a2a;
 
+// 程序入口：初始化 Echo Agent 并执行自测试（非常重要）。
 int main() {
     std::cout << "=== A2A C++ Echo Agent with HTTP Server ===" << std::endl << std::endl;
     

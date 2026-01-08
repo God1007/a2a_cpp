@@ -1,3 +1,4 @@
+// 概述: 定义 SDK 通用类型、枚举与字符串转换工具，依赖 C++17 标准库时间与容器。
 #pragma once
 
 #include <string>
@@ -50,6 +51,7 @@ enum class AgentTransport {
 };
 
 // Helper functions
+// 将消息角色枚举转换为协议字符串。
 inline std::string to_string(MessageRole role) {
     switch (role) {
         case MessageRole::User: return "user";
@@ -59,6 +61,7 @@ inline std::string to_string(MessageRole role) {
     }
 }
 
+// 将任务状态枚举转换为协议字符串。
 inline std::string to_string(TaskState state) {
     switch (state) {
         case TaskState::Submitted: return "submitted";
@@ -71,6 +74,7 @@ inline std::string to_string(TaskState state) {
     }
 }
 
+// 从协议字符串解析消息角色枚举。
 inline MessageRole message_role_from_string(const std::string& str) {
     if (str == "user") return MessageRole::User;
     if (str == "agent") return MessageRole::Agent;
@@ -78,6 +82,7 @@ inline MessageRole message_role_from_string(const std::string& str) {
     return MessageRole::User;
 }
 
+// 从协议字符串解析任务状态枚举。
 inline TaskState task_state_from_string(const std::string& str) {
     if (str == "submitted") return TaskState::Submitted;
     if (str == "running") return TaskState::Running;

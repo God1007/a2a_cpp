@@ -1,3 +1,4 @@
+// 概述: 通义千问 API 客户端封装，基于 libcurl 与 nlohmann::json 发送请求并解析响应。
 #pragma once
 
 #include <string>
@@ -14,6 +15,7 @@ using json = nlohmann::json;
  */
 class QwenClient {
 public:
+    // 构造客户端并初始化全局 CURL 环境。
     explicit QwenClient(const std::string& api_key, 
                        const std::string& model = "qwen-plus")
         : api_key_(api_key)
@@ -22,6 +24,7 @@ public:
         curl_global_init(CURL_GLOBAL_DEFAULT);
     }
     
+    // 析构时清理全局 CURL 环境。
     ~QwenClient() {
         curl_global_cleanup();
     }
@@ -32,6 +35,7 @@ public:
      * @param user_message 用户消息
      * @return AI 回复
      */
+    // 调用通义千问 API 并返回回复文本（非常重要）。
     std::string chat(const std::string& system_prompt, 
                     const std::string& user_message) {
         // 构造请求 JSON
@@ -84,11 +88,13 @@ public:
     }
 
 private:
+    // libcurl 写回调：收集响应体内容。
     static size_t write_callback(void* contents, size_t size, size_t nmemb, void* userp) {
         ((std::string*)userp)->append((char*)contents, size * nmemb);
         return size * nmemb;
     }
     
+    // 发送 POST 请求并返回响应体字符串。
     std::string send_post_request(const std::string& data) {
         CURL* curl = curl_easy_init();
         if (!curl) {
