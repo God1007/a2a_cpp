@@ -1,3 +1,4 @@
+// 概述: A2A 异常实现文件，当前为头文件内联实现的占位单元。
 #include <a2a/core/exception.hpp>
 
 namespace a2a {

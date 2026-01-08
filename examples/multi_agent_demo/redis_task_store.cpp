@@ -1,3 +1,4 @@
+// 概述: Redis TaskStore 实现，使用 hiredis 与 nlohmann::json 进行存储与解析。
 #include "redis_task_store.hpp"
 #include <iostream>
 #include <cstdarg>
@@ -11,6 +12,7 @@ RedisTaskStore::RedisTaskStore(const std::string& host, int port)
     : context_(nullptr)
     , host_(host)
     , port_(port) {
+    // 初始化 Redis 连接并输出日志（非常重要）。
     
     std::cout << "[RedisTaskStore] 连接到 Redis " << host << ":" << port << std::endl;
     
@@ -30,6 +32,7 @@ RedisTaskStore::RedisTaskStore(const std::string& host, int port)
 }
 
 RedisTaskStore::~RedisTaskStore() {
+    // 释放 Redis 连接资源。
     if (context_) {
         redisFree(context_);
         std::cout << "[RedisTaskStore] 断开连接" << std::endl;
@@ -37,6 +40,7 @@ RedisTaskStore::~RedisTaskStore() {
 }
 
 void RedisTaskStore::ensure_connection() {
+    // 检测连接状态并必要时重连。
     if (context_ && !context_->err) {
         return;
     }
@@ -55,6 +59,7 @@ void RedisTaskStore::ensure_connection() {
 }
 
 redisReply* RedisTaskStore::execute_command(const char* format, ...) {
+    // 执行 Redis 命令并做错误处理（非常重要）。
     std::lock_guard<std::mutex> lock(mutex_);
     
     ensure_connection();
@@ -78,6 +83,7 @@ redisReply* RedisTaskStore::execute_command(const char* format, ...) {
 }
 
 std::optional<AgentTask> RedisTaskStore::get_task(const std::string& task_id) {
+    // 从 Redis 获取任务并反序列化。
     try {
         auto reply = execute_command("GET %s", task_key(task_id).c_str());
         
@@ -99,6 +105,7 @@ std::optional<AgentTask> RedisTaskStore::get_task(const std::string& task_id) {
 }
 
 void RedisTaskStore::set_task(const AgentTask& task) {
+    // 将任务序列化并写入 Redis。
     try {
         std::string json_str = task.to_json();
         auto reply = execute_command("SET %s %s", 
@@ -114,6 +121,7 @@ void RedisTaskStore::set_task(const AgentTask& task) {
 }
 
 bool RedisTaskStore::task_exists(const std::string& task_id) {
+    // 检查任务 key 是否存在。
     try {
         auto reply = execute_command("EXISTS %s", task_key(task_id).c_str());
         bool exists = (reply->integer == 1);
@@ -127,6 +135,7 @@ bool RedisTaskStore::task_exists(const std::string& task_id) {
 }
 
 bool RedisTaskStore::delete_task(const std::string& task_id) {
+    // 删除任务 key 并返回是否删除成功。
     try {
         auto reply = execute_command("DEL %s", task_key(task_id).c_str());
         bool deleted = (reply->integer > 0);
@@ -142,6 +151,7 @@ bool RedisTaskStore::delete_task(const std::string& task_id) {
 void RedisTaskStore::update_status(const std::string& task_id,
                                    TaskState status,
                                    const std::string& message) {
+    // 读取任务并更新状态字段。
     try {
         auto task = get_task(task_id);
         if (task.has_value()) {
@@ -160,6 +170,7 @@ void RedisTaskStore::update_status(const std::string& task_id,
 
 void RedisTaskStore::add_artifact(const std::string& task_id,
                                   const Artifact& artifact) {
+    // 读取任务并追加产物。
     try {
         auto task = get_task(task_id);
         if (task.has_value()) {
@@ -174,6 +185,7 @@ void RedisTaskStore::add_artifact(const std::string& task_id,
 
 void RedisTaskStore::add_history_message(const std::string& task_id,
                                         const AgentMessage& message) {
+    // 追加历史消息到 Redis List（非常重要）。
     try {
         std::string json_str = message.to_json();
         
@@ -198,6 +210,7 @@ void RedisTaskStore::add_history_message(const std::string& task_id,
 
 std::vector<AgentMessage> RedisTaskStore::get_history(const std::string& context_id,
                                                       int max_length) {
+    // 读取历史消息列表并反序列化。
     std::vector<AgentMessage> history;
     
     try {

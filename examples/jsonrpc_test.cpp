@@ -1,3 +1,4 @@
+// 概述: JSON-RPC 功能验证测试程序，覆盖序列化/反序列化与错误处理流程。
 // JSON-RPC 功能验证测试程序
 #include <a2a/core/jsonrpc_request.hpp>
 #include <a2a/core/jsonrpc_response.hpp>
@@ -7,6 +8,7 @@
 
 using namespace a2a;
 
+// 测试请求序列化是否包含必要字段。
 void test_request_serialization() {
     std::cout << "=== 测试 1: JSON-RPC 请求序列化 ===" << std::endl;
     
@@ -27,6 +29,7 @@ void test_request_serialization() {
     std::cout << "✓ 测试通过\n" << std::endl;
 }
 
+// 测试请求反序列化能否正确解析字段。
 void test_request_deserialization() {
     std::cout << "=== 测试 2: JSON-RPC 请求反序列化 ===" << std::endl;
     
@@ -56,6 +59,7 @@ void test_request_deserialization() {
     std::cout << "✓ 测试通过\n" << std::endl;
 }
 
+// 测试数字 ID 反序列化后的字符串转换。
 void test_request_with_numeric_id() {
     std::cout << "=== 测试 3: 数字 ID 处理 ===" << std::endl;
     
@@ -73,6 +77,7 @@ void test_request_with_numeric_id() {
     std::cout << "✓ 测试通过\n" << std::endl;
 }
 
+// 测试成功响应的序列化格式。
 void test_response_success() {
     std::cout << "=== 测试 4: 成功响应序列化 ===" << std::endl;
     
@@ -90,6 +95,7 @@ void test_response_success() {
     std::cout << "✓ 测试通过\n" << std::endl;
 }
 
+// 测试错误响应的序列化格式。
 void test_response_error() {
     std::cout << "=== 测试 5: 错误响应序列化 ===" << std::endl;
     
@@ -110,6 +116,7 @@ void test_response_error() {
     std::cout << "✓ 测试通过\n" << std::endl;
 }
 
+// 测试成功响应的反序列化解析。
 void test_response_deserialization_success() {
     std::cout << "=== 测试 6: 成功响应反序列化 ===" << std::endl;
     
@@ -139,6 +146,7 @@ void test_response_deserialization_success() {
     std::cout << "✓ 测试通过\n" << std::endl;
 }
 
+// 测试错误响应的反序列化解析。
 void test_response_deserialization_error() {
     std::cout << "=== 测试 7: 错误响应反序列化 ===" << std::endl;
     
@@ -173,6 +181,7 @@ void test_response_deserialization_error() {
     std::cout << "✓ 测试通过\n" << std::endl;
 }
 
+// 测试复杂嵌套 JSON 参数的序列化与反序列化。
 void test_complex_nested_json() {
     std::cout << "=== 测试 8: 复杂嵌套 JSON 处理 ===" << std::endl;
     
@@ -213,6 +222,7 @@ void test_complex_nested_json() {
     std::cout << "✓ 测试通过\n" << std::endl;
 }
 
+// 测试异常与错误码处理逻辑（非常重要）。
 void test_error_handling() {
     std::cout << "=== 测试 9: 错误处理 ===" << std::endl;
     
@@ -229,6 +239,7 @@ void test_error_handling() {
     std::cout << "✓ 测试通过\n" << std::endl;
 }
 
+// 测试特殊字符与转义处理。
 void test_special_characters() {
     std::cout << "=== 测试 10: 特殊字符和转义处理 ===" << std::endl;
     
@@ -252,6 +263,7 @@ void test_special_characters() {
     std::cout << "✓ 测试通过\n" << std::endl;
 }
 
+// 程序入口：顺序执行所有测试用例并打印结果。
 int main() {
     std::cout << "╔══════════════════════════════════════════╗" << std::endl;
     std::cout << "║  A2A C++ SDK - JSON-RPC 功能验证测试     ║" << std::endl;

@@ -1,3 +1,4 @@
+// 概述: Redis Math Agent 实现，读取 Redis 历史并调用通义千问进行数学推理。
 #include <a2a/server/task_manager.hpp>
 #include <a2a/core/exception.hpp>
 #include <a2a/core/jsonrpc_request.hpp>
@@ -17,6 +18,7 @@ using namespace a2a;
  */
 class RedisMathAgent {
 public:
+    // 构造数学 Agent 并初始化 TaskManager 与大模型客户端。
     explicit RedisMathAgent(const std::string& api_key,
                             std::shared_ptr<ITaskStore> task_store,
                             int port = 5001)
@@ -39,6 +41,7 @@ public:
         std::cout << "[Math Agent] 初始化完成（使用 Redis TaskStore）" << std::endl;
     }
     
+    // 启动 HTTP 服务并注册处理器（非常重要）。
     void start() {
         std::cout << "[Math Agent] 启动在端口 " << port_ << std::endl;
         
@@ -63,6 +66,7 @@ public:
     }
 
 private:
+    // 处理消息，拼接历史上下文并调用大模型（非常重要）。
     A2AResponse handle_message(const MessageSendParams& params) {
         const auto& message = params.message();
         std::string user_query = message.get_text();
@@ -131,6 +135,7 @@ private:
         }
     }
     
+    // 构建并返回 AgentCard 元数据。
     AgentCard get_agent_card(const std::string& agent_url) {
         auto card = AgentCard::create()
             .with_name("Math Agent (Redis TaskStore)")
@@ -141,6 +146,7 @@ private:
         return card;
     }
     
+    // 处理 HTTP 请求并返回 JSON-RPC 响应。
     std::string handle_http_request(const std::string& request_body) {
         try {
             auto jsonrpc_req = JsonRpcRequest::from_json(request_body);
@@ -177,11 +183,13 @@ private:
 };
 
 void signal_handler(int signal) {
+    // 处理终止信号并退出。
     std::cout << "\n[Math Agent] 收到信号 " << signal << "，正在关闭..." << std::endl;
     exit(0);
 }
 
 int main(int argc, char* argv[]) {
+    // 程序入口：解析参数并启动 Math Agent（非常重要）。
     std::signal(SIGINT, signal_handler);
     std::signal(SIGTERM, signal_handler);
     

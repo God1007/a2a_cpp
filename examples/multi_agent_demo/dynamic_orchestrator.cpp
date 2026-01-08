@@ -1,3 +1,4 @@
+// 概述: 动态服务发现 Orchestrator，调用注册中心发现 Agent，并结合 Redis 历史进行调度。
 #include "redis_task_store.hpp"
 #include "qwen_client.hpp"
 #include "http_server.hpp"
@@ -23,6 +24,7 @@ using json = nlohmann::json;
 // 简单的 HTTP 客户端
 class SimpleHttpClient {
 public:
+    // 发送 JSON POST 请求并返回响应字符串。
     static std::string post(const std::string& url, const std::string& body) {
         CURL* curl = curl_easy_init();
         if (!curl) return "";
@@ -50,6 +52,7 @@ const std::string API_KEY = "own—key";
 
 class DynamicOrchestrator {
 public:
+    // 构造动态编排器并初始化 Redis/注册中心客户端。
     DynamicOrchestrator(const std::string& agent_id,
                        const std::string& listen_address,
                        const std::string& registry_url,
@@ -64,6 +67,7 @@ public:
         std::cout << "[Orchestrator] 初始化完成" << std::endl;
     }
     
+    // 启动 HTTP 服务并注册到注册中心（非常重要）。
     void start(int port) {
         // 启动 HTTP 服务器
         HttpServer server(port);
@@ -105,6 +109,7 @@ public:
     }
 
 private:
+    // 处理 JSON-RPC 请求并路由到具体能力。
     std::string handle_request(const std::string& body) {
         try {
             auto request_json = json::parse(body);
@@ -164,6 +169,7 @@ private:
         }
     }
     
+    // 使用大模型识别意图类别。
     std::string analyze_intent(const std::string& text) {
         std::string prompt = "判断以下用户输入属于哪个类别，只回答类别名称：\n"
                            "- math: 数学计算、方程求解\n"
@@ -178,6 +184,7 @@ private:
         return "general";
     }
     
+    // 调用动态发现的 Math Agent 处理数学问题。
     std::string call_math_agent(const std::string& query, const std::string& context_id) {
         try {
             // 从注册中心查找 Math Agent
@@ -218,6 +225,7 @@ private:
         }
     }
     
+    // 处理通用对话请求并结合历史上下文。
     std::string handle_general_query(const std::string& query, const std::string& context_id) {
         auto history = task_store_->get_history(context_id, 5);
         std::string history_text;
@@ -236,6 +244,7 @@ private:
         return qwen_client_.chat(history_text, query);
     }
     
+    // 保存消息到 Redis TaskStore。
     void save_message(const std::string& context_id, const AgentMessage& message) {
         if (!task_store_->task_exists(context_id)) {
             auto task = AgentTask::create()
@@ -247,6 +256,7 @@ private:
         task_store_->add_history_message(context_id, message);
     }
     
+    // 生成 AgentCard JSON 字符串。
     std::string get_agent_card() {
         json card = {
             {"name", "Orchestrator Agent"},
@@ -287,6 +297,7 @@ private:
 };
 
 int main(int argc, char* argv[]) {
+    // 程序入口：解析参数并启动动态编排器（非常重要）。
     if (argc < 4) {
         std::cerr << "用法: " << argv[0] << " <agent_id> <port> <registry_url> [redis_host] [redis_port]" << std::endl;
         std::cerr << "示例: " << argv[0] << " orch-1 5000 http://localhost:8500 127.0.0.1 6379" << std::endl;

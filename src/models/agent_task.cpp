@@ -1,9 +1,11 @@
+// 概述: 实现 AgentTask 的 JSON 序列化与反序列化（简化解析）。
 #include <a2a/models/agent_task.hpp>
 #include <sstream>
 
 namespace a2a {
 
 std::string AgentTask::to_json() const {
+    // 序列化任务为 JSON 字符串（非常重要）。
     std::ostringstream oss;
     oss << "{";
     
@@ -49,6 +51,7 @@ std::string AgentTask::to_json() const {
 }
 
 AgentTask AgentTask::from_json(const std::string& json) {
+    // 反序列化 JSON 字符串为任务对象。
     AgentTask task;
     
     // Extract id

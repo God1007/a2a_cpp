@@ -1,9 +1,11 @@
+// 概述: 实现 AgentCard 及相关结构的 JSON 序列化/反序列化，使用字符串拼接解析。
 #include <a2a/models/agent_card.hpp>
 #include <sstream>
 
 namespace a2a {
 
 // AgentCapabilities implementation
+// 将能力信息序列化为 JSON 字符串。
 std::string AgentCapabilities::to_json() const {
     std::ostringstream oss;
     oss << "{"
@@ -14,6 +16,7 @@ std::string AgentCapabilities::to_json() const {
     return oss.str();
 }
 
+// 从 JSON 字符串解析能力信息。
 AgentCapabilities AgentCapabilities::from_json(const std::string& json) {
     AgentCapabilities caps;
     caps.streaming = json.find("\"streaming\":true") != std::string::npos;
@@ -23,6 +26,7 @@ AgentCapabilities AgentCapabilities::from_json(const std::string& json) {
 }
 
 // AgentSkill implementation
+// 将技能信息序列化为 JSON 字符串。
 std::string AgentSkill::to_json() const {
     std::ostringstream oss;
     oss << "{"
@@ -51,6 +55,7 @@ std::string AgentSkill::to_json() const {
     return oss.str();
 }
 
+// 从 JSON 字符串解析技能信息。
 AgentSkill AgentSkill::from_json(const std::string& json) {
     AgentSkill skill;
     
@@ -74,6 +79,7 @@ AgentSkill AgentSkill::from_json(const std::string& json) {
 }
 
 // AgentProvider implementation
+// 将提供方信息序列化为 JSON 字符串。
 std::string AgentProvider::to_json() const {
     std::ostringstream oss;
     oss << "{"
@@ -88,6 +94,7 @@ std::string AgentProvider::to_json() const {
     return oss.str();
 }
 
+// 从 JSON 字符串解析提供方信息。
 AgentProvider AgentProvider::from_json(const std::string& json) {
     AgentProvider provider;
     
@@ -111,6 +118,7 @@ AgentProvider AgentProvider::from_json(const std::string& json) {
 }
 
 // AgentCard implementation
+// 将 AgentCard 序列化为 JSON 字符串（非常重要）。
 std::string AgentCard::to_json() const {
     std::ostringstream oss;
     oss << "{";
@@ -169,6 +177,7 @@ std::string AgentCard::to_json() const {
     return oss.str();
 }
 
+// 从 JSON 字符串解析 AgentCard（非常重要）。
 AgentCard AgentCard::from_json(const std::string& json) {
     AgentCard card;
     

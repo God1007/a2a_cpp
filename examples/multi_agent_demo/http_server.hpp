@@ -1,3 +1,4 @@
+// 概述: 简易 HTTP 服务器实现，基于 POSIX socket 接口处理请求与路由。
 #pragma once
 
 #include <string>
@@ -19,16 +20,20 @@ class HttpServer {
 public:
     using RequestHandler = std::function<std::string(const std::string&)>;
     
+    // 构造 HTTP 服务器并指定监听端口。
     explicit HttpServer(int port) : port_(port), running_(false) {}
     
+    // 析构时停止服务器。
     ~HttpServer() {
         stop();
     }
     
+    // 注册路径处理器，按路径回调生成响应体。
     void register_handler(const std::string& path, RequestHandler handler) {
         handlers_[path] = handler;
     }
     
+    // 启动服务器并进入监听循环（非常重要）。
     void start() {
         running_ = true;
         
@@ -80,11 +85,13 @@ public:
         close(server_fd);
     }
     
+    // 停止服务器循环。
     void stop() {
         running_ = false;
     }
 
 private:
+    // 处理单个客户端连接：解析请求并返回 JSON 响应。
     void handle_client(int client_fd) {
         char buffer[8192] = {0};
         ssize_t bytes_read = read(client_fd, buffer, sizeof(buffer) - 1);

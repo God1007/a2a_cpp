@@ -1,3 +1,4 @@
+// 概述: 注册中心服务端实现，基于 HttpServer 与 nlohmann::json 处理注册/发现/心跳。
 #include "agent_registry.hpp"
 #include "http_server.hpp"
 #include <nlohmann/json.hpp>
@@ -9,12 +10,13 @@
 using json = nlohmann::json;
 
 // CURL 回调
+// libcurl 写回调：收集响应体。
 static size_t WriteCallback(void* contents, size_t size, size_t nmemb, std::string* userp) {
     userp->append((char*)contents, size * nmemb);
     return size * nmemb;
 }
 
-// 获取 Agent Card
+// 获取 Agent Card（A2A 标准端点）。
 json fetch_agent_card(const std::string& agent_address) {
     CURL* curl = curl_easy_init();
     if (!curl) {
@@ -50,6 +52,7 @@ json fetch_agent_card(const std::string& agent_address) {
 std::unique_ptr<AgentRegistry> g_registry;
 
 void signal_handler(int signal) {
+    // 处理终止信号并退出进程。
     std::cout << "\n[Registry Server] 收到信号 " << signal << "，正在关闭..." << std::endl;
     exit(0);
 }
@@ -59,12 +62,14 @@ void signal_handler(int signal) {
  */
 class RegistryServer {
 public:
+    // 构造注册中心服务并初始化注册表。
     explicit RegistryServer(int port = 8500)
         : port_(port)
         , registry_(std::make_unique<AgentRegistry>(30, 60)) {
         std::cout << "[Registry Server] 初始化完成" << std::endl;
     }
     
+    // 启动 HTTP 服务并注册各路由处理器（非常重要）。
     void start() {
         std::cout << "[Registry Server] 启动在端口 " << port_ << std::endl;
         
@@ -118,6 +123,7 @@ public:
     }
 
 private:
+    // 处理注册请求并保存 Agent 信息。
     std::string handle_register(const std::string& body) {
         try {
             auto j = json::parse(body);
@@ -154,6 +160,7 @@ private:
         }
     }
     
+    // 处理注销请求。
     std::string handle_deregister(const std::string& body) {
         try {
             auto j = json::parse(body);
@@ -179,6 +186,7 @@ private:
         }
     }
     
+    // 处理心跳请求，更新存活时间。
     std::string handle_heartbeat(const std::string& body) {
         try {
             auto j = json::parse(body);
@@ -201,6 +209,7 @@ private:
         }
     }
     
+    // 处理标签查询请求并返回 Agent 列表。
     std::string handle_find(const std::string& body) {
         try {
             auto j = json::parse(body);
@@ -230,6 +239,7 @@ private:
         }
     }
     
+    // 返回所有已注册 Agent 列表。
     std::string handle_list_all() {
         try {
             auto agents = registry_->get_all_agents();
@@ -261,6 +271,7 @@ private:
 };
 
 int main() {
+    // 程序入口：启动注册中心服务（非常重要）。
     // 设置信号处理
     std::signal(SIGINT, signal_handler);
     std::signal(SIGTERM, signal_handler);

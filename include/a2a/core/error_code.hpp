@@ -1,3 +1,4 @@
+// 概述: 定义 A2A 错误码枚举与错误码描述转换，基于 JSON-RPC 2.0 规范。
 #pragma once
 
 #include <cstdint>
@@ -26,6 +27,7 @@ enum class ErrorCode : int32_t {
 /**
  * @brief Convert error code to string description
  */
+// 将错误码转换为人类可读描述字符串（非常重要）。
 inline const char* error_code_to_string(ErrorCode code) {
     switch (code) {
         case ErrorCode::ParseError:

@@ -1,3 +1,4 @@
+// 概述: 实现 JSON-RPC 请求序列化与反序列化，使用 nlohmann::json 解析与构建 JSON。
 #include <a2a/core/jsonrpc_request.hpp>
 #include <a2a/core/exception.hpp>
 #include <json.hpp>
@@ -7,6 +8,7 @@ using json = nlohmann::json;
 namespace a2a {
 
 std::string JsonRpcRequest::to_json() const {
+    // 将请求对象序列化为 JSON 字符串（非常重要）。
     try {
         json j;
         j["jsonrpc"] = jsonrpc_;
@@ -28,6 +30,7 @@ std::string JsonRpcRequest::to_json() const {
 }
 
 JsonRpcRequest JsonRpcRequest::from_json(const std::string& json_str) {
+    // 解析 JSON 字符串为请求对象，处理字段缺省与 ID 类型（非常重要）。
     try {
         json j = json::parse(json_str);
         
